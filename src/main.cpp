@@ -1,3 +1,4 @@
+#include "joystick.h"
 #include "lcd.h"
 #include <Arduino.h>
 
@@ -21,6 +22,8 @@ const Bitmap player_bm = {
     B01010, //
 };
 
+Joystick joy = {.X_PIN = 1, .Y_PIN = 0, .SW_PIN = 3};
+
 void setup() {
   LCD_init(&lcd);
   LCD_print(&lcd, "Hello world!");
@@ -30,6 +33,21 @@ void setup() {
 
   LCD_set_cursor(&lcd, 1, 0);
   LCD_print(&lcd, 0);
+
+  Serial.begin(9600);
 }
 
-void loop() {}
+int x_move, y_move;
+
+void loop() {
+  x_move = Joystick_X_poll(&joy);
+  y_move = Joystick_Y_poll(&joy);
+
+  Serial.print("x: ");
+  Serial.println(x_move);
+
+  Serial.print("y: ");
+  Serial.println(y_move);
+
+  delay(1000);
+}
