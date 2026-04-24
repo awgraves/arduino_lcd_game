@@ -44,6 +44,5 @@ void LCD_create_char(int addr, BITMAP bits);
 // manual control commands
 void LCD_move_cursor(LCD *lcd, int row, int col);
 void LCD_print(LCD *lcd, char *c);
-void LCD_print(LCD *lcd, int i);
 
 #endif
