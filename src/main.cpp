@@ -24,30 +24,46 @@ const Bitmap player_bm = {
 
 Joystick joy = {.X_PIN = 1, .Y_PIN = 0, .SW_PIN = 3};
 
-void setup() {
-  LCD_init(&lcd);
-  LCD_print(&lcd, "Hello world!");
-  LCD_print(&lcd, B11111111);
+int x_move, y_move;
 
-  LCD_create_char(&lcd, 0, player_bm);
+typedef struct {
+  uint8_t row;
+  uint8_t col;
+} Pos;
 
-  LCD_set_cursor(&lcd, 1, 0);
-  LCD_print(&lcd, 0);
+Pos pos = {1, 0};
 
-  Serial.begin(9600);
+const uint8_t PLAYER_BM_IDX = 0;
+
+Grid grid;
+
+void draw() {
+  for (int row = 0; row < GRID_HEIGHT; row++) {
+    for (int col = 0; col < GRID_WIDTH; col++) {
+      grid[row][col] =
+          (pos.col == col) && (pos.row == row) ? PLAYER_BM_IDX : ' ';
+    }
+  }
+
+  LCD_draw(&lcd, grid);
 }
 
-int x_move, y_move;
+void setup() {
+  LCD_init(&lcd);
+  LCD_create_char(&lcd, PLAYER_BM_IDX, player_bm);
+}
 
 void loop() {
   x_move = Joystick_X_poll(&joy);
   y_move = Joystick_Y_poll(&joy);
 
-  Serial.print("x: ");
-  Serial.println(x_move);
+  int pot_x = x_move + pos.col;
+  if (pot_x >= 0 && pot_x <= 15)
+    pos.col = pot_x;
 
-  Serial.print("y: ");
-  Serial.println(y_move);
+  int pot_y = pos.row - y_move;
+  if (pot_y >= 0 && pot_y <= 1)
+    pos.row = pot_y;
 
-  delay(1000);
+  draw();
 }

@@ -27,7 +27,9 @@ typedef struct {
   int D7_PIN;
 } LCD;
 
-typedef uint8_t Grid[2][16];
+const int GRID_HEIGHT = 2;
+const int GRID_WIDTH = 16;
+typedef uint8_t Grid[GRID_HEIGHT][GRID_WIDTH];
 
 const int BITMAP_HEIGHT = 8;
 const int BITMAP_WIDTH = 5;
@@ -41,7 +43,7 @@ void LCD_clear(LCD *lcd);
 
 // custom character creation
 // up to 16 custom chars (idx is zero indexed)
-void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bits);
+void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm);
 
 // manual control commands
 void LCD_set_cursor(LCD *lcd, int row, int col);

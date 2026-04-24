@@ -70,6 +70,14 @@ void LCD_clear(LCD *lcd) {
   delay(3);
 }
 
+void LCD_draw(LCD *lcd, Grid grid) {
+  for (int i = 0; i < GRID_HEIGHT; i++) {
+    LCD_set_cursor(lcd, i, 0);
+    for (int j = 0; j < GRID_WIDTH; j++)
+      LCD_print(lcd, grid[i][j]);
+  }
+}
+
 void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm) {
   char_idx = char_idx < 15 ? char_idx : 15; // safety check, only 16 addresses
   int addr = char_idx * 8;                  // offset for each row in CGRAM
