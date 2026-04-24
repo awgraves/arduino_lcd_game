@@ -31,7 +31,8 @@ typedef uint8_t Grid[2][16];
 
 const int BITMAP_HEIGHT = 8;
 const int BITMAP_WIDTH = 5;
-typedef uint8_t BITMAP[BITMAP_HEIGHT][BITMAP_WIDTH];
+// 8 rows of 5 bits
+typedef uint8_t Bitmap[BITMAP_HEIGHT];
 
 // general commands
 void LCD_init(LCD *lcd);
@@ -39,10 +40,12 @@ void LCD_draw(LCD *lcd, Grid grid);
 void LCD_clear(LCD *lcd);
 
 // custom character creation
-void LCD_create_char(int addr, BITMAP bits);
+// up to 16 custom chars (idx is zero indexed)
+void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bits);
 
 // manual control commands
-void LCD_move_cursor(LCD *lcd, int row, int col);
-void LCD_print(LCD *lcd, char *c);
+void LCD_set_cursor(LCD *lcd, int row, int col);
+void LCD_print(LCD *lcd, const char *c);
+void LCD_print(LCD *lcd, int n);
 
 #endif

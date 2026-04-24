@@ -70,11 +70,30 @@ void LCD_clear(LCD *lcd) {
   delay(3);
 }
 
-void LCD_print(LCD *lcd, char *c) {
+void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm) {
+  char_idx = char_idx < 15 ? char_idx : 15; // safety check, only 16 addresses
+  int addr = char_idx * 8;                  // offset for each row in CGRAM
+  write_command(lcd, CMD_SET_CGRAM_ADDR | addr);
+
+  for (int i = 0; i < BITMAP_HEIGHT; i++)
+    write_data(lcd, bm[i]);
+}
+
+void LCD_set_cursor(LCD *lcd, int row, int col) {
+  // see pg. 11 of datasheet
+  row = row == 0 ? 0x00 : 0x40;
+  col = col < 15 ? col : 15;
+  uint8_t addr = row + col;
+  write_command(lcd, CMD_SET_DDRAM_ADDR | addr);
+}
+
+void LCD_print(LCD *lcd, const char *c) {
   while (*c) {
     write_data(lcd, *c++);
   }
 }
+
+void LCD_print(LCD *lcd, int n) { write_data(lcd, n); }
 
 /* low level helpers */
 void pulse(LCD *lcd) {
@@ -110,5 +129,4 @@ void write_byte(LCD *lcd, uint8_t n, REG reg) {
 }
 
 void write_command(LCD *lcd, uint8_t n) { write_byte(lcd, n, IR); }
-
 void write_data(LCD *lcd, uint8_t n) { write_byte(lcd, n, DR); }
