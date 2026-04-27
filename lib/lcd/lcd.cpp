@@ -3,7 +3,7 @@
 
 // see pages 24-25 of datasheet
 // https://www.alldatasheet.com/datasheet-pdf/view/63673/HITACHI/HD44780.html
-enum REG { IR = 0, DR = 1 }; // instruction vs data
+enum REG { IR = 0, DR = 1 }; // instruction vs data register
 
 // part of the initialization process
 // 8bit mode command is just a nibble (4 bits)
@@ -14,17 +14,15 @@ const int CMD_NIBBLE_4BIT_MODE = 0x2;
 // full byte commands, sent in 2 nibbles
 const int CMD_4BIT_MODE = 0x28;
 const int CMD_CLEAR = 0x01;
-const int CMD_HOME = 0x02;
 const int CMD_ENTRY_MODE = 0x06;
 const int CMD_DISPLAY_ON = 0x0C;
 const int CMD_DISPLAY_OFF = 0x08;
 const int CMD_SET_CGRAM_ADDR = 1 << 6;
 const int CMD_SET_DDRAM_ADDR = 1 << 7;
 
-void LCD_clear(LCD *lcd);
-void write_nibble(LCD *lcd, uint8_t n, REG reg);
-void write_command(LCD *lcd, uint8_t n);
-void write_data(LCD *lcd, uint8_t n);
+static void write_nibble(LCD *lcd, uint8_t n, REG reg);
+static void write_command(LCD *lcd, uint8_t n);
+static void write_data(LCD *lcd, uint8_t n);
 
 /* High level funcs */
 void LCD_init(LCD *lcd) {
@@ -42,11 +40,11 @@ void LCD_init(LCD *lcd) {
 
   // set 8 bit mode
   write_nibble(lcd, CMD_NIBBLE_8BIT_MODE, IR);
-  delay(5); // wait 5 ms
+  delay(5);
 
   // set 8 bit mode again
   write_nibble(lcd, CMD_NIBBLE_8BIT_MODE, IR);
-  delayMicroseconds(150); // 150 microseconds to be saff
+  delayMicroseconds(150);
 
   // set 8 bit mode a 3rd time
   write_nibble(lcd, CMD_NIBBLE_8BIT_MODE, IR);
@@ -61,13 +59,11 @@ void LCD_init(LCD *lcd) {
   LCD_clear(lcd);
   write_command(lcd, CMD_ENTRY_MODE);
   write_command(lcd, CMD_DISPLAY_ON);
-  write_command(lcd, CMD_HOME);
 }
 
 void LCD_clear(LCD *lcd) {
   write_command(lcd, CMD_CLEAR);
-  // this instruction takes a while!
-  delay(3);
+  delay(2); // extra slow instruction, needs more time
 }
 
 void LCD_draw(LCD *lcd, Grid grid) {
@@ -103,21 +99,27 @@ void LCD_print(LCD *lcd, const char *c) {
 
 void LCD_print(LCD *lcd, int n) { write_data(lcd, n); }
 
+/* mid level helpers */
+static void write_byte(LCD *lcd, uint8_t n, REG reg);
+
+static void write_command(LCD *lcd, uint8_t n) { write_byte(lcd, n, IR); }
+static void write_data(LCD *lcd, uint8_t n) { write_byte(lcd, n, DR); }
+
 /* low level helpers */
-void pulse(LCD *lcd) {
-  // see pg 52 of datasheet
-  // i chose arbitrarily higher delay intervals
-  // just in case
+static void pulse(LCD *lcd) {
+  // see pg 52 of datasheet for timing tolerances
   digitalWrite(lcd->EN_PIN, LOW);
-  delayMicroseconds(500);
+  delayMicroseconds(1);
   digitalWrite(lcd->EN_PIN, HIGH);
-  delayMicroseconds(500);
+  delayMicroseconds(1); // at least 200 ns
   digitalWrite(lcd->EN_PIN, LOW);
-  delayMicroseconds(500);
+  // most commands have max execution time of
+  // 37 microseconds
+  delayMicroseconds(40);
 };
 
 // send 4 lowest bits
-void write_nibble(LCD *lcd, uint8_t n, REG reg) {
+static void write_nibble(LCD *lcd, uint8_t n, REG reg) {
   // which register to write to
   digitalWrite(lcd->RS_PIN, reg);
 
@@ -130,11 +132,8 @@ void write_nibble(LCD *lcd, uint8_t n, REG reg) {
   pulse(lcd);
 }
 
-void write_byte(LCD *lcd, uint8_t n, REG reg) {
+static void write_byte(LCD *lcd, uint8_t n, REG reg) {
   // split 8 bits into 2 nibbles
   write_nibble(lcd, n >> 4, reg);
   write_nibble(lcd, n, reg);
 }
-
-void write_command(LCD *lcd, uint8_t n) { write_byte(lcd, n, IR); }
-void write_data(LCD *lcd, uint8_t n) { write_byte(lcd, n, DR); }

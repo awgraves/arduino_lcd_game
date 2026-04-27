@@ -2,8 +2,8 @@
 From scratch replacement
 of the LiquidCrystal Arduino lib.
 
-Writing this lib in "C-style" C++
-for even lower level practice.
+Writing this driver in "C-style" C++
+for lower level practice.
 
 Custom tailored to a 16x2 display
 (which contains the HD44780)
@@ -13,13 +13,14 @@ https://www.alldatasheet.com/datasheet-pdf/view/63673/HITACHI/HD44780.html
 #define LCD_H
 #include <stdint.h>
 
-// 16x2 in 4-bit mode
+/*
+LCD represents a 16x2 LCD wired for 4-bit mode.
+R/W pin should be connected to GND - ie always in 'write' mode.
+*/
 typedef struct {
   // Register select and enable
   int RS_PIN;
   int EN_PIN;
-  // (R/W pin hard-wired low
-  // so always in 'write' mode)
   // 4-bit data pins
   int D4_PIN;
   int D5_PIN;
@@ -42,7 +43,7 @@ void LCD_draw(LCD *lcd, Grid grid);
 void LCD_clear(LCD *lcd);
 
 // custom character creation
-// up to 16 custom chars (idx is zero indexed)
+// up to 16 custom chars (zero indexed)
 void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm);
 
 // manual control commands

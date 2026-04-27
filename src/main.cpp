@@ -66,4 +66,5 @@ void loop() {
     pos.row = pot_y;
 
   draw();
+  delay(100);
 }
