@@ -1,5 +1,6 @@
 #include "joystick.h"
 #include "lcd.h"
+#include "render.h"
 #include <Arduino.h>
 
 LCD lcd = {
@@ -9,17 +10,6 @@ LCD lcd = {
     .D5_PIN = 11,
     .D6_PIN = 12,
     .D7_PIN = 13,
-};
-
-const Bitmap player_bm = {
-    B01110, //
-    B01110, //
-    B00100, //
-    B01110, //
-    B11111, //
-    B01110, //
-    B01010, //
-    B01010, //
 };
 
 Joystick joy = {.X_PIN = 1, .Y_PIN = 0, .SW_PIN = 3};
@@ -33,24 +23,22 @@ typedef struct {
 
 Pos pos = {1, 0};
 
-const uint8_t PLAYER_BM_IDX = 0;
-
 Grid grid;
-
-void draw() {
-  for (int row = 0; row < GRID_HEIGHT; row++) {
-    for (int col = 0; col < GRID_WIDTH; col++) {
-      grid[row][col] =
-          (pos.col == col) && (pos.row == row) ? PLAYER_BM_IDX : ' ';
-    }
-  }
-
-  LCD_draw(&lcd, grid);
-}
 
 void setup() {
   LCD_init(&lcd);
-  LCD_create_char(&lcd, PLAYER_BM_IDX, player_bm);
+  render_init(&lcd);
+}
+
+void update_grid() {
+  for (int row = 0; row < GRID_HEIGHT; row++) {
+    for (int col = 0; col < GRID_WIDTH; col++) {
+      grid[row][col] =
+          (pos.col == col) && (pos.row == row) ? PLAYER_BM_CODE : ' ';
+    }
+  }
+
+  render(grid);
 }
 
 void loop() {
@@ -65,6 +53,6 @@ void loop() {
   if (pot_y >= 0 && pot_y <= 1)
     pos.row = pot_y;
 
-  draw();
-  delay(100);
+  update_grid();
+  delay(150);
 }

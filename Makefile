@@ -1,3 +1,5 @@
+# generates compile_commands.json
+# for clangd / ccls in IDE
 @phony setup:
 	pio run -t compiledb
 
