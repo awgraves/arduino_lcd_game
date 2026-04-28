@@ -94,15 +94,20 @@ void render(const GameState *s) {
 
   // then add objects (1 - y because lcd driver has top row as zero)
   // but game coordinates have ground at 0, and jump is 1
-  Obj obj;
+  const Obj *obj;
+  int16_t obj_vx;
+
   for (int i = 0; i < s->object_count; i++) {
-    obj = s->objects[i];
-    grid[1 - obj.y][obj.x] = get_obj_bm_code(obj.type);
+    obj = &s->objects[i];
+    obj_vx = obj->x - s->camera_x;
+    if (obj_vx > 15 || obj_vx < 0)
+      continue;
+    grid[1 - obj->y][obj_vx] = get_obj_bm_code(obj->type);
   }
 
   // lastly add player
   // same 1 - y inversion as above.
-  grid[1 - s->player.y][s->player.x] = get_player_bm_code(s);
+  grid[1 - s->player.y][s->player.x - s->camera_x] = get_player_bm_code(s);
 
   render_grid(grid);
 }

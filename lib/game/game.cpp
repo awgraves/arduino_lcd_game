@@ -9,6 +9,8 @@ void GameState_init(GameState *s) {
   s->player.on_ground = true;
   s->player.y_vel = 0;
 
+  s->camera_x = 0;
+
   for (int i = 0; i < MAX_OBJECTS; i++)
     s->objects[i] = {.x = 0, .y = 0, .type = NONE};
 
@@ -22,6 +24,7 @@ void GameState_init(GameState *s) {
 };
 
 static void update_player_pos(GameState *s, Inputs *in);
+static void update_camera_pos(GameState *s);
 
 void GameState_update(GameState *s, Inputs *in) {
   // player bitmap select
@@ -32,6 +35,7 @@ void GameState_update(GameState *s, Inputs *in) {
   }
 
   update_player_pos(s, in);
+  update_camera_pos(s);
 }
 
 /* helpers */
@@ -68,6 +72,10 @@ static void update_player_pos(GameState *s, Inputs *in) {
 
   // check for ground
   s->player.on_ground = is_on_ground(s);
+}
+
+static void update_camera_pos(GameState *s) {
+  s->camera_x = (s->player.x - 8 >= 0) ? s->player.x - 8 : 0;
 }
 
 static bool is_blocked(GameState *s, int16_t x, int16_t y) {
