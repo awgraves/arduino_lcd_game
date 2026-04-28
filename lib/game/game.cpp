@@ -10,6 +10,7 @@ void GameState_init(GameState *s) {
   s->player.y_vel = 0;
 
   s->camera_x = 0;
+  s->camera_y = 0;
 
   for (int i = 0; i < MAX_OBJECTS; i++)
     s->objects[i] = {.x = 0, .y = 0, .type = NONE};
@@ -20,7 +21,9 @@ void GameState_init(GameState *s) {
   s->objects[2] = {.x = 8, .y = 1, .type = BLOCK};
   s->objects[3] = {.x = 12, .y = 0, .type = BLOCK};
   s->objects[4] = {.x = 13, .y = 0, .type = BLOCK};
-  s->object_count = 5;
+  s->objects[5] = {.x = 13, .y = 1, .type = BLOCK};
+  s->objects[6] = {.x = 14, .y = 0, .type = BLOCK};
+  s->object_count = 7;
 };
 
 static void update_player_pos(GameState *s, Inputs *in);
@@ -44,14 +47,17 @@ static bool is_on_ground(GameState *s);
 
 static void update_player_pos(GameState *s, Inputs *in) {
   // gravity
-  if (!s->player.on_ground)
+  if (s->player.on_ground)
+    s->player.y_vel = 0;
+  else
     s->player.y_vel = s->player.y_vel >= 0 ? s->player.y_vel - 1
                                            : -1; // max -1 block per tick
 
-  // jumps
-  if (in->sw_pressed && s->player.on_ground) {
+  // jump only if button wasnt already held in
+  if (in->sw_pressed && !s->sw_prev_pressed && s->player.on_ground) {
     s->player.y_vel = 1;
   }
+  s->sw_prev_pressed = in->sw_pressed;
 
   int16_t pot_y = s->player.y + s->player.y_vel;
   int16_t pot_x = s->player.x + in->x_move;
@@ -76,6 +82,12 @@ static void update_player_pos(GameState *s, Inputs *in) {
 
 static void update_camera_pos(GameState *s) {
   s->camera_x = (s->player.x - 8 >= 0) ? s->player.x - 8 : 0;
+
+  if (s->player.y - s->camera_y > 1) {
+    s->camera_y = s->player.y;
+  } else if (s->player.y - s->camera_y < 1 && s->player.y > 0) {
+    s->camera_y = s->player.y - 1;
+  }
 }
 
 static bool is_blocked(GameState *s, int16_t x, int16_t y) {

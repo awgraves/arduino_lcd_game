@@ -23,7 +23,10 @@ typedef struct {
     Direction facing;
   } player;
 
+  bool sw_prev_pressed;
+
   int16_t camera_x;
+  int16_t camera_y;
 
   Obj objects[MAX_OBJECTS];
   int object_count;

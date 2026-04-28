@@ -96,18 +96,23 @@ void render(const GameState *s) {
   // but game coordinates have ground at 0, and jump is 1
   const Obj *obj;
   int16_t obj_vx;
+  int16_t obj_vy;
 
   for (int i = 0; i < s->object_count; i++) {
     obj = &s->objects[i];
     obj_vx = obj->x - s->camera_x;
-    if (obj_vx > 15 || obj_vx < 0)
+    obj_vy = obj->y - s->camera_y;
+    // check if object should render in the viewport
+    if ((obj_vx > GRID_WIDTH - 1 || obj_vx < 0) ||
+        (obj_vy > GRID_HEIGHT - 1 || obj_vy < 0))
       continue;
-    grid[1 - obj->y][obj_vx] = get_obj_bm_code(obj->type);
+    grid[1 - obj_vy][obj_vx] = get_obj_bm_code(obj->type);
   }
 
   // lastly add player
   // same 1 - y inversion as above.
-  grid[1 - s->player.y][s->player.x - s->camera_x] = get_player_bm_code(s);
+  grid[1 - s->player.y + s->camera_y][s->player.x - s->camera_x] =
+      get_player_bm_code(s);
 
   render_grid(grid);
 }
