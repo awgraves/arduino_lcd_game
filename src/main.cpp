@@ -22,12 +22,14 @@ void setup() {
   LCD_init(&lcd);
   render_init(&lcd);
   GameState_init(&s);
-  Serial.begin(9600);
 }
 
 void loop() {
-  inputs.move_x = Joystick_X_poll(&joy);
+  inputs.x_move = Joystick_X_poll(&joy);
+  inputs.sw_pressed = Joystick_SW_poll_pressed(&joy);
+
   GameState_update(&s, &inputs);
+
   render(&s);
   delay(125);
 }

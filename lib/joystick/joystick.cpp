@@ -1,6 +1,8 @@
 #include "joystick.h"
 
 void Joystick_init(Joystick *j) {
+  // using external 10k pullup resistor
+  // for SW pin
   pinMode(j->SW_PIN, INPUT);
   pinMode(j->X_PIN, INPUT);
   pinMode(j->Y_PIN, INPUT);
@@ -31,3 +33,7 @@ int Joystick_Y_poll(Joystick *j) {
   // no movement
   return 0;
 };
+
+bool Joystick_SW_poll_pressed(Joystick *j) {
+  return digitalRead(j->SW_PIN) == LOW;
+}

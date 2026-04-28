@@ -7,24 +7,29 @@ const int MAX_OBJECTS = 10;
 typedef enum { NONE, BLOCK } ObjType;
 
 typedef struct {
+  int16_t x;
+  int16_t y;
   ObjType type;
-  uint16_t pos_x;
-  uint16_t pos_y;
 } Obj;
 
-typedef enum { LEFT, RIGHT, STOP } Direction;
+typedef enum { LEFT, RIGHT, CENTER } Direction;
 
 typedef struct {
-  uint16_t player_x;
-  uint16_t player_y;
-  Direction player_facing;
+  struct {
+    int16_t x;
+    int16_t y;
+    int8_t y_vel; // velocity
+    bool on_ground;
+    Direction facing;
+  } player;
 
   Obj objects[MAX_OBJECTS];
   int object_count;
 } GameState;
 
 typedef struct {
-  int8_t move_x;
+  int8_t x_move;
+  bool sw_pressed;
 } Inputs;
 
 void GameState_init(GameState *s);

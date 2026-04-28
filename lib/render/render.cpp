@@ -85,30 +85,34 @@ static void render_grid(Grid g);
 
 void render(const GameState *s) {
   Grid grid;
-  // clear other stuff and add player
+  // start with blank grid
   for (int row = 0; row < GRID_HEIGHT; row++) {
     for (int col = 0; col < GRID_WIDTH; col++) {
-      if ((s->player_x == col) && (s->player_y == row)) {
-        grid[row][col] = get_player_bm_code(s);
-      } else {
-        grid[row][col] = ' ';
-      }
+      grid[row][col] = ' ';
     }
   }
 
-  // then add objects
+  // then add objects (1 - y because lcd driver has top row as zero)
+  // but game coordinates have ground at 0, and jump is 1
   Obj obj;
   for (int i = 0; i < s->object_count; i++) {
     obj = s->objects[i];
-    grid[obj.pos_y][obj.pos_x] = get_obj_bm_code(obj.type);
+    grid[1 - obj.y][obj.x] = get_obj_bm_code(obj.type);
   }
+
+  // lastly add player
+  // same 1 - y inversion as above.
+  grid[1 - s->player.y][s->player.x] = get_player_bm_code(s);
 
   render_grid(grid);
 }
 
 /* helpers */
 static char get_player_bm_code(const GameState *s) {
-  switch (s->player_facing) {
+  if (!s->player.on_ground) {
+    return '*';
+  }
+  switch (s->player.facing) {
   case LEFT:
     return PLAYER_BM_LEFT;
   case RIGHT:

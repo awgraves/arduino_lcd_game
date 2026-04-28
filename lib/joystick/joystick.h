@@ -14,4 +14,6 @@ void Joystick_init(Joystick *j);
 int Joystick_X_poll(Joystick *j);
 int Joystick_Y_poll(Joystick *j);
 
+bool Joystick_SW_poll_pressed(Joystick *j);
+
 #endif
