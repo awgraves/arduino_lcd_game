@@ -8,14 +8,14 @@ typedef char Grid[GRID_HEIGHT][GRID_WIDTH];
 
 /* Bitmap codes */
 typedef enum {
+  // LCD is limited to 8 total custom bitmap definitions
   PLAYER_BM_CENTER,
   PLAYER_BM_LEFT_0,
   PLAYER_BM_LEFT_1,
   PLAYER_BM_RIGHT_0,
   PLAYER_BM_RIGHT_1,
-  PLAYER_BM_JUMP_RIGHT,
-  PLAYER_BM_JUMP_LEFT,
   BLOCK_BM,
+  FLAG_BM,
 } BitmapIDX;
 
 /* Bitmap definitions */
@@ -28,28 +28,6 @@ static const Bitmap player_center = {
     B00100, //
     B01010, //
     B01010, //
-};
-
-static const Bitmap player_jump_right = {
-    B01110, //
-    B01110, //
-    B00101, //
-    B11111, //
-    B10100, //
-    B00111, //
-    B11101, //
-    B00000, //
-};
-
-static const Bitmap player_jump_left = {
-    B01110, //
-    B01110, //
-    B10100, //
-    B11111, //
-    B00101, //
-    B11100, //
-    B10111, //
-    B00000, //
 };
 
 static const Bitmap player_left_0 = {
@@ -107,9 +85,20 @@ static const Bitmap block = {
     B11111, //
 };
 
+static const Bitmap flag = {
+    B10000, //
+    B11000, //
+    B11100, //
+    B11110, //
+    B10000, //
+    B10000, //
+    B10000, //
+    B10000, //
+};
+
 typedef struct {
   BitmapIDX frames[2];
-  uint8_t frame_idx; // 1 bit
+  uint8_t frame_idx; // 0 or 1
 } Sprite;
 
 Sprite player_left = {.frames = {PLAYER_BM_LEFT_0, PLAYER_BM_LEFT_1},
@@ -133,13 +122,12 @@ void render_init(LCD *lcd) {
     }
   }
   LCD_create_char(lcd, PLAYER_BM_CENTER, player_center);
-  LCD_create_char(lcd, PLAYER_BM_JUMP_RIGHT, player_jump_right);
-  LCD_create_char(lcd, PLAYER_BM_JUMP_LEFT, player_jump_left);
   LCD_create_char(lcd, PLAYER_BM_LEFT_0, player_left_0);
   LCD_create_char(lcd, PLAYER_BM_LEFT_1, player_left_1);
   LCD_create_char(lcd, PLAYER_BM_RIGHT_0, player_right_0);
   LCD_create_char(lcd, PLAYER_BM_RIGHT_1, player_right_1);
   LCD_create_char(lcd, BLOCK_BM, block);
+  LCD_create_char(lcd, FLAG_BM, flag);
 }
 
 static char get_player_bm_code(const GameState *s);
@@ -187,8 +175,7 @@ static char get_sprite_frame(Sprite *spr) {
 
 static char get_player_bm_code(const GameState *s) {
   if (!s->player.on_ground) {
-    return s->player.facing == LEFT ? PLAYER_BM_JUMP_LEFT
-                                    : PLAYER_BM_JUMP_RIGHT;
+    return s->player.facing == LEFT ? PLAYER_BM_LEFT_0 : PLAYER_BM_RIGHT_0;
   }
   switch (s->player.facing) {
   case LEFT:
@@ -204,6 +191,10 @@ static char get_obj_bm_code(ObjType t) {
   switch (t) {
   case OBJ_BLOCK:
     return BLOCK_BM;
+  case OBJ_FLAG:
+    return FLAG_BM;
+  case OBJ_SPIKE:
+    return '*';
   default:
     return ' ';
   }

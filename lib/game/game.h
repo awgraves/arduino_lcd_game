@@ -4,7 +4,7 @@
 
 const int MAX_OBJECTS = 100;
 
-typedef enum { OBJ_BLOCK } ObjType;
+typedef enum { OBJ_BLOCK, OBJ_FLAG, OBJ_SPIKE } ObjType;
 
 typedef struct {
   int16_t x;
