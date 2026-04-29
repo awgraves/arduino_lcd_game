@@ -67,8 +67,9 @@ void LCD_clear(LCD *lcd) {
 }
 
 void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm) {
-  char_idx = char_idx < 15 ? char_idx : 15; // safety check, only 16 addresses
-  int addr = char_idx * 8;                  // offset for each row in CGRAM
+  char_idx =
+      char_idx <= 7 ? char_idx : 7; // safety check, only 8 custom char slots
+  int addr = char_idx * 8;          // offset for each row in CGRAM
   write_command(lcd, CMD_SET_CGRAM_ADDR | addr);
 
   for (int i = 0; i < BITMAP_HEIGHT; i++)
