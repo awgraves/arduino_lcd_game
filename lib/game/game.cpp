@@ -11,10 +11,10 @@ static void update_player_pos(GameState *s, Inputs *in);
 static void update_camera_pos(GameState *s);
 
 void GameState_update(GameState *s, Inputs *in) {
-  // player bitmap select
   if (in->x_move != 0) {
     s->player.facing = (in->x_move == 1) ? RIGHT : LEFT;
-  } else {
+  } else if (s->player.on_ground) {
+    // only allow face center when standing
     s->player.facing = CENTER;
   }
 

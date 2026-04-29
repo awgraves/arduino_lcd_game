@@ -8,13 +8,15 @@ typedef char Grid[GRID_HEIGHT][GRID_WIDTH];
 
 /* Bitmap codes */
 typedef enum {
-  PLAYER_BM_STOP,
+  PLAYER_BM_CENTER,
   PLAYER_BM_LEFT,
   PLAYER_BM_RIGHT,
+  PLAYER_BM_JUMP_RIGHT,
+  PLAYER_BM_JUMP_LEFT,
   BLOCK_BM,
 } BitmapIDX;
 
-static const Bitmap player_stop = {
+static const Bitmap player_center = {
     B01110, //
     B01110, //
     B00100, //
@@ -23,6 +25,28 @@ static const Bitmap player_stop = {
     B00100, //
     B01010, //
     B01010, //
+};
+
+static const Bitmap player_jump_right = {
+    B01110, //
+    B01110, //
+    B00101, //
+    B11111, //
+    B10100, //
+    B00111, //
+    B11101, //
+    B00000, //
+};
+
+static const Bitmap player_jump_left = {
+    B01110, //
+    B01110, //
+    B10100, //
+    B11111, //
+    B00101, //
+    B11100, //
+    B10111, //
+    B00000, //
 };
 
 static const Bitmap player_left = {
@@ -73,7 +97,9 @@ void render_init(LCD *lcd) {
       r.buf[i][j] = ' '; // begin with empty spaces in each position
     }
   }
-  LCD_create_char(lcd, PLAYER_BM_STOP, player_stop);
+  LCD_create_char(lcd, PLAYER_BM_CENTER, player_center);
+  LCD_create_char(lcd, PLAYER_BM_JUMP_RIGHT, player_jump_right);
+  LCD_create_char(lcd, PLAYER_BM_JUMP_LEFT, player_jump_left);
   LCD_create_char(lcd, PLAYER_BM_LEFT, player_left);
   LCD_create_char(lcd, PLAYER_BM_RIGHT, player_right);
   LCD_create_char(lcd, BLOCK_BM, block);
@@ -120,7 +146,8 @@ void render(const GameState *s) {
 /* helpers */
 static char get_player_bm_code(const GameState *s) {
   if (!s->player.on_ground) {
-    return '*';
+    return s->player.facing == LEFT ? PLAYER_BM_JUMP_LEFT
+                                    : PLAYER_BM_JUMP_RIGHT;
   }
   switch (s->player.facing) {
   case LEFT:
@@ -128,7 +155,7 @@ static char get_player_bm_code(const GameState *s) {
   case RIGHT:
     return PLAYER_BM_RIGHT;
   default:
-    return PLAYER_BM_STOP;
+    return PLAYER_BM_CENTER;
   }
 }
 
