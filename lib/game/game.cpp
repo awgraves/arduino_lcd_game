@@ -28,19 +28,29 @@ static bool is_on_ground(GameState *s);
 
 static void update_player_pos(GameState *s, Inputs *in) {
   // gravity
-  if (s->player.on_ground)
-    s->player.y_vel = 0;
-  else
-    s->player.y_vel = s->player.y_vel >= 0 ? s->player.y_vel - 1
-                                           : -1; // max -1 block per tick
+  if (!s->player.on_ground && s->player.y_vel >= 0) {
+    // hang time
+    if (s->player.y_vel == 0 && s->player.y_hold_remaining) {
+      s->player.y_vel = 0;
+      s->player.y_hold_remaining--;
+    } else {
+      s->player.y_vel--;
+    }
+  }
 
-  // jump only if button wasnt already held in
-  if (in->sw_pressed && !s->sw_prev_pressed && s->player.on_ground) {
-    s->player.y_vel = 1;
+  // jump
+  if (s->player.on_ground && !s->sw_prev_pressed && in->sw_pressed) {
+    // long jump (2 tiles)
+    s->player.y_vel = 2;
+    s->player.y_hold_remaining = 1;
+  } else if (!s->player.on_ground && s->sw_prev_pressed && !in->sw_pressed) {
+    // cut jump short (1 tile), user let press go early
+    s->player.y_vel = 0;
+    s->player.y_hold_remaining = 0;
   }
   s->sw_prev_pressed = in->sw_pressed;
 
-  int16_t pot_y = s->player.y + s->player.y_vel;
+  int16_t pot_y = s->player.y + (s->player.y_vel > 0 ? 1 : s->player.y_vel);
   int16_t pot_x = s->player.x + in->x_move;
 
   // resolve y move
@@ -58,7 +68,8 @@ static void update_player_pos(GameState *s, Inputs *in) {
   }
 
   // check for ground
-  s->player.on_ground = is_on_ground(s);
+  if ((s->player.on_ground = is_on_ground(s)))
+    s->player.y_vel = 0;
 }
 
 static void update_camera_pos(GameState *s) {
