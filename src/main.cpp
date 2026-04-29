@@ -2,6 +2,7 @@
 #include "joystick.h"
 #include "lcd.h"
 #include "render.h"
+#include "world.h"
 #include <Arduino.h>
 
 LCD lcd = {
@@ -21,7 +22,9 @@ GameState s;
 void setup() {
   LCD_init(&lcd);
   render_init(&lcd);
+
   GameState_init(&s);
+  load_world(&s);
 }
 
 void loop() {

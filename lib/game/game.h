@@ -2,9 +2,9 @@
 #define GAME_H
 #include <stdint.h>
 
-const int MAX_OBJECTS = 10;
+const int MAX_OBJECTS = 100;
 
-typedef enum { NONE, BLOCK } ObjType;
+typedef enum { OBJ_BLOCK } ObjType;
 
 typedef struct {
   int16_t x;

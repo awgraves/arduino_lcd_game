@@ -3,27 +3,8 @@
 
 /* Public API */
 void GameState_init(GameState *s) {
-  s->player.x = 7;
-  s->player.y = 0;
+  memset(s, 0, sizeof(GameState));
   s->player.facing = CENTER;
-  s->player.on_ground = true;
-  s->player.y_vel = 0;
-
-  s->camera_x = 0;
-  s->camera_y = 0;
-
-  for (int i = 0; i < MAX_OBJECTS; i++)
-    s->objects[i] = {.x = 0, .y = 0, .type = NONE};
-
-  // first block
-  s->objects[0] = {.x = 0, .y = 0, .type = BLOCK};
-  s->objects[1] = {.x = 0, .y = 1, .type = BLOCK};
-  s->objects[2] = {.x = 8, .y = 1, .type = BLOCK};
-  s->objects[3] = {.x = 12, .y = 0, .type = BLOCK};
-  s->objects[4] = {.x = 13, .y = 0, .type = BLOCK};
-  s->objects[5] = {.x = 13, .y = 1, .type = BLOCK};
-  s->objects[6] = {.x = 14, .y = 0, .type = BLOCK};
-  s->object_count = 7;
 };
 
 static void update_player_pos(GameState *s, Inputs *in);
@@ -96,7 +77,7 @@ static bool is_blocked(GameState *s, int16_t x, int16_t y) {
 
   for (int i = 0; i < s->object_count; i++) {
     Obj *obj = &s->objects[i];
-    if (obj->type != BLOCK)
+    if (obj->type != OBJ_BLOCK)
       continue;
 
     if (obj->x == x && obj->y == y)

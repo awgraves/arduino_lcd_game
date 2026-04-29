@@ -134,7 +134,7 @@ static char get_player_bm_code(const GameState *s) {
 
 static char get_obj_bm_code(ObjType t) {
   switch (t) {
-  case BLOCK:
+  case OBJ_BLOCK:
     return BLOCK_BM;
   default:
     return ' ';
