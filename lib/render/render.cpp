@@ -130,40 +130,31 @@ void render_init(LCD *lcd) {
   LCD_create_char(lcd, FLAG_BM, flag);
 }
 
-static char get_player_bm_code(const GameState *s);
-static char get_obj_bm_code(ObjType t);
+static char get_tile_bitmap_code(Tile t);
+static char get_player_bitmap_code(const GameState *s);
 static void render_grid(Grid g);
 
 void render(const GameState *s) {
   Grid grid;
-  // start with blank grid
-  for (int row = 0; row < GRID_HEIGHT; row++) {
-    for (int col = 0; col < GRID_WIDTH; col++) {
-      grid[row][col] = ' ';
+
+  // map offsets
+  int16_t y_max_vis = s->camera_y + GRID_HEIGHT;
+  int16_t x_max_vis = s->camera_x + GRID_WIDTH;
+
+  // place the tiles that would be visible
+  for (int y = s->camera_y; y < y_max_vis; y++) {
+    for (int x = s->camera_x; x < x_max_vis; x++) {
+      // 1 - y inversion because lcd places 0, 0 in TOP left
+      // while the game places 0, 0 in BOTTOM left.
+      grid[1 - (y - s->camera_y)][x - s->camera_x] =
+          get_tile_bitmap_code(s->map[x][y]);
     }
   }
 
-  // then add objects (1 - y because lcd driver has top row as zero)
-  // but game coordinates have ground at 0, and jump is 1
-  const Obj *obj;
-  int16_t obj_vx;
-  int16_t obj_vy;
-
-  for (int i = 0; i < s->object_count; i++) {
-    obj = &s->objects[i];
-    obj_vx = obj->x - s->camera_x;
-    obj_vy = obj->y - s->camera_y;
-    // check if object should render in the viewport
-    if ((obj_vx > GRID_WIDTH - 1 || obj_vx < 0) ||
-        (obj_vy > GRID_HEIGHT - 1 || obj_vy < 0))
-      continue;
-    grid[1 - obj_vy][obj_vx] = get_obj_bm_code(obj->type);
-  }
-
-  // lastly add player
+  // add the player
   // same 1 - y inversion as above.
-  grid[1 - s->player.y + s->camera_y][s->player.x - s->camera_x] =
-      get_player_bm_code(s);
+  grid[1 - (s->player.y - s->camera_y)][s->player.x - s->camera_x] =
+      get_player_bitmap_code(s);
 
   render_grid(grid);
 }
@@ -173,7 +164,7 @@ static char get_sprite_frame(Sprite *spr) {
   return spr->frames[spr->frame_idx ^= 1];
 };
 
-static char get_player_bm_code(const GameState *s) {
+static char get_player_bitmap_code(const GameState *s) {
   if (!s->player.on_ground) {
     return s->player.facing == LEFT ? PLAYER_BM_LEFT_0 : PLAYER_BM_RIGHT_0;
   }
@@ -187,13 +178,15 @@ static char get_player_bm_code(const GameState *s) {
   }
 }
 
-static char get_obj_bm_code(ObjType t) {
+static char get_tile_bitmap_code(Tile t) {
   switch (t) {
-  case OBJ_BLOCK:
+  case TILE_EMPTY:
+    return ' ';
+  case TILE_BLOCK:
     return BLOCK_BM;
-  case OBJ_FLAG:
+  case TILE_FLAG:
     return FLAG_BM;
-  case OBJ_SPIKE:
+  case TILE_SPIKE:
     return '*';
   default:
     return ' ';

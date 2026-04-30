@@ -4,17 +4,18 @@
 
 const int MAX_OBJECTS = 100;
 
-typedef enum { OBJ_BLOCK, OBJ_FLAG, OBJ_SPIKE } ObjType;
+typedef enum { TILE_EMPTY, TILE_BLOCK, TILE_SPIKE, TILE_FLAG } Tile;
 
-typedef struct {
-  int16_t x;
-  int16_t y;
-  ObjType type;
-} Obj;
+const int MAX_MAP_HEIGHT = 10;
+const int MAX_MAP_WIDTH = 64;
+
+typedef Tile TileMap[MAX_MAP_WIDTH][MAX_MAP_HEIGHT];
 
 typedef enum { LEFT, RIGHT, CENTER } Direction;
 
 typedef struct {
+  TileMap map;
+
   struct {
     int16_t x;
     int16_t y;
@@ -28,9 +29,6 @@ typedef struct {
 
   int16_t camera_x;
   int16_t camera_y;
-
-  Obj objects[MAX_OBJECTS];
-  int object_count;
 } GameState;
 
 typedef struct {

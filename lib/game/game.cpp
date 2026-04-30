@@ -45,8 +45,7 @@ static void update_player_pos(GameState *s, Inputs *in) {
     s->player.y_hold_remaining = 1;
   } else if (!s->player.on_ground && s->sw_prev_pressed && !in->sw_pressed) {
     // cut jump short (1 tile), user let press go early
-    s->player.y_vel = 0;
-    s->player.y_hold_remaining = 0;
+    s->player.y_vel = s->player.y_hold_remaining = 0;
   }
   s->sw_prev_pressed = in->sw_pressed;
 
@@ -83,23 +82,9 @@ static void update_camera_pos(GameState *s) {
 }
 
 static bool is_blocked(GameState *s, int16_t x, int16_t y) {
-  if (y < 0)
-    return true;
-
-  for (int i = 0; i < s->object_count; i++) {
-    Obj *obj = &s->objects[i];
-    if (obj->type != OBJ_BLOCK)
-      continue;
-
-    if (obj->x == x && obj->y == y)
-      return true;
-  }
-
-  return false;
+  return (y < 0) || s->map[x][y] == TILE_BLOCK;
 }
 
 static bool is_on_ground(GameState *s) {
-  if (s->player.y == 0)
-    return true;
   return is_blocked(s, s->player.x, s->player.y - 1);
 }
