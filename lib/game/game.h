@@ -14,14 +14,21 @@ typedef Tile TileMap[MAX_MAP_WIDTH][MAX_MAP_HEIGHT];
 
 typedef enum { LEFT, RIGHT, CENTER } Direction;
 
+typedef enum {
+  JUMP_NONE,
+  JUMP_START,
+  JUMP_RISING,
+  JUMP_APEX,
+  JUMP_FALLING,
+} JumpPhase;
+
 typedef struct {
   TileMap map;
 
   struct {
     int16_t x;
     int16_t y;
-    int8_t y_vel;
-    int8_t y_hold_remaining;
+    JumpPhase jump_phase;
     bool on_ground;
     Direction facing;
   } player;

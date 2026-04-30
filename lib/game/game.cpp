@@ -23,42 +23,47 @@ void GameState_update(GameState *s, Inputs *in) {
 }
 
 /* helpers */
+static int8_t jump_vel[] = {
+    [JUMP_NONE] = 0,     //
+    [JUMP_START] = 1,    //
+    [JUMP_RISING] = 1,   //
+    [JUMP_APEX] = 0,     //
+    [JUMP_FALLING] = -1, //
+};
+
+static inline JumpPhase next_phase(JumpPhase p) {
+  return p < JUMP_FALLING ? (JumpPhase)(p + 1) : JUMP_FALLING;
+}
+
 static bool is_blocked(GameState *s, int16_t x, int16_t y);
 
 static void update_player_pos(GameState *s, Inputs *in) {
-  // gravity
-  if (!s->player.on_ground && s->player.y_vel >= 0) {
-    // hang time at the top
-    if (s->player.y_vel == 0 && s->player.y_hold_remaining) {
-      s->player.y_vel = 0;
-      s->player.y_hold_remaining--;
-    } else {
-      s->player.y_vel--;
-    }
-  }
-
-  // jump
   bool sw_just_pressed = in->sw_pressed && !s->sw_prev_pressed;
   bool sw_just_released = !in->sw_pressed && s->sw_prev_pressed;
+
+  // jump
   if (sw_just_pressed && s->player.on_ground) {
-    // long jump (2 tiles)
-    s->player.y_vel = 2;
-    s->player.y_hold_remaining = 1;
+    s->player.jump_phase = JUMP_START;
   } else if (sw_just_released && !s->player.on_ground) {
-    // cut jump short if user let go early
-    s->player.y_vel = s->player.y_hold_remaining = 0;
+    s->player.jump_phase =
+        s->player.jump_phase < JUMP_APEX ? JUMP_APEX : JUMP_FALLING;
   }
   s->sw_prev_pressed = in->sw_pressed;
 
+  // apply gravity if just walked off a ledge
+  if (!s->player.on_ground && s->player.jump_phase == JUMP_NONE) {
+    s->player.jump_phase = JUMP_FALLING;
+  }
+
   // calc next potential axis destinations
-  int16_t pot_y = s->player.y + (s->player.y_vel > 0 ? 1 : s->player.y_vel);
+  int16_t pot_y = s->player.y + jump_vel[s->player.jump_phase];
   int16_t pot_x = s->player.x + in->x_move;
 
   // resolve y move
   if (!is_blocked(s, s->player.x, pot_y)) {
     s->player.y = pot_y;
-  } else if (s->player.y_vel > 0) {
-    s->player.y_vel = s->player.y_hold_remaining = 0;
+  } else {
+    s->player.jump_phase = JUMP_FALLING;
   }
 
   // resolve x move
@@ -68,7 +73,12 @@ static void update_player_pos(GameState *s, Inputs *in) {
 
   // check for ground
   if ((s->player.on_ground = is_blocked(s, s->player.x, s->player.y - 1)))
-    s->player.y_vel = 0;
+    s->player.jump_phase = JUMP_NONE;
+
+  // update jump phase
+  if (s->player.jump_phase != JUMP_NONE) {
+    s->player.jump_phase = next_phase(s->player.jump_phase);
+  }
 }
 
 static void update_camera_pos(GameState *s) {
