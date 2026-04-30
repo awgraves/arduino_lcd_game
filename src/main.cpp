@@ -27,12 +27,28 @@ void setup() {
   load_world(&s);
 }
 
+ButtonState sw_to_btn_state(SwitchState sw) {
+  switch (sw) {
+  case SW_OPEN:
+    return BTN_OPEN;
+  case SW_JUST_PRESSED:
+    return BTN_JUST_PRESSED;
+  case SW_HOLD:
+    return BTN_HOLD;
+  case SW_JUST_RELEASED:
+    return BTN_JUST_RELEASED;
+  }
+}
+
+inline void poll_inputs(Inputs *in) {
+  in->x_move = Joystick_X_poll(&joy);
+  in->btn_state = sw_to_btn_state(Joystick_SW_poll(&joy));
+}
+
 void loop() {
-  inputs.x_move = Joystick_X_poll(&joy);
-  inputs.sw_pressed = Joystick_SW_poll_pressed(&joy);
-
+  poll_inputs(&inputs);
   GameState_update(&s, &inputs);
-
   render(&s);
+
   delay(125);
 }

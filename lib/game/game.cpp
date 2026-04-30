@@ -38,17 +38,13 @@ static inline JumpPhase next_phase(JumpPhase p) {
 static bool is_blocked(GameState *s, int16_t x, int16_t y);
 
 static void update_player_pos(GameState *s, Inputs *in) {
-  bool sw_just_pressed = in->sw_pressed && !s->sw_prev_pressed;
-  bool sw_just_released = !in->sw_pressed && s->sw_prev_pressed;
-
   // jump
-  if (sw_just_pressed && s->player.on_ground) {
+  if (in->btn_state == BTN_JUST_PRESSED && s->player.on_ground) {
     s->player.jump_phase = JUMP_START;
-  } else if (sw_just_released && !s->player.on_ground) {
+  } else if (in->btn_state == BTN_JUST_RELEASED && !s->player.on_ground) {
     s->player.jump_phase =
         s->player.jump_phase < JUMP_APEX ? JUMP_APEX : JUMP_FALLING;
   }
-  s->sw_prev_pressed = in->sw_pressed;
 
   // apply gravity if just walked off a ledge
   if (!s->player.on_ground && s->player.jump_phase == JUMP_NONE) {

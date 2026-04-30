@@ -6,6 +6,8 @@ void Joystick_init(Joystick *j) {
   pinMode(j->SW_PIN, INPUT);
   pinMode(j->X_PIN, INPUT);
   pinMode(j->Y_PIN, INPUT);
+
+  j->_state.prev_sw_read = HIGH;
 };
 
 int Joystick_X_poll(Joystick *j) {
@@ -34,6 +36,25 @@ int Joystick_Y_poll(Joystick *j) {
   return 0;
 };
 
-bool Joystick_SW_poll_pressed(Joystick *j) {
-  return digitalRead(j->SW_PIN) == LOW;
+SwitchState Joystick_SW_poll(Joystick *j) {
+  // LOW means pressed (0)
+  // HIGH means not pressed (1)
+  bool sw_read = digitalRead(j->SW_PIN);
+  bool prev_read = j->_state.prev_sw_read;
+
+  SwitchState result;
+
+  if (sw_read && prev_read) {
+    result = SW_OPEN;
+  } else if (!sw_read && prev_read) {
+    result = SW_JUST_PRESSED;
+  } else if (!sw_read && !prev_read) {
+    result = SW_HOLD;
+  } else {
+    result = SW_JUST_RELEASED;
+  }
+
+  j->_state.prev_sw_read = sw_read;
+
+  return result;
 }

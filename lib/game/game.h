@@ -33,15 +33,20 @@ typedef struct {
     Direction facing;
   } player;
 
-  bool sw_prev_pressed;
-
   int16_t camera_x;
   int16_t camera_y;
 } GameState;
 
+typedef enum {
+  BTN_OPEN,
+  BTN_JUST_PRESSED,
+  BTN_HOLD,
+  BTN_JUST_RELEASED
+} ButtonState;
+
 typedef struct {
   int8_t x_move;
-  bool sw_pressed;
+  ButtonState btn_state;
 } Inputs;
 
 void GameState_init(GameState *s);

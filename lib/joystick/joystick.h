@@ -3,10 +3,21 @@
 #include <Arduino.h>
 
 typedef struct {
-  int X_PIN;
-  int Y_PIN;
-  int SW_PIN;
+  uint8_t X_PIN;
+  uint8_t Y_PIN;
+  uint8_t SW_PIN;
+
+  struct {
+    bool prev_sw_read; // raw GPIO read
+  } _state;
 } Joystick;
+
+typedef enum {
+  SW_OPEN,
+  SW_JUST_PRESSED,
+  SW_HOLD,
+  SW_JUST_RELEASED
+} SwitchState;
 
 void Joystick_init(Joystick *j);
 
@@ -14,6 +25,5 @@ void Joystick_init(Joystick *j);
 int Joystick_X_poll(Joystick *j);
 int Joystick_Y_poll(Joystick *j);
 
-bool Joystick_SW_poll_pressed(Joystick *j);
-
+SwitchState Joystick_SW_poll(Joystick *j);
 #endif
