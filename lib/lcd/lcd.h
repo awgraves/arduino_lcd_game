@@ -19,17 +19,17 @@ R/W pin should be connected to GND - ie always in 'write' mode.
 */
 typedef struct {
   // Register select and enable
-  int RS_PIN;
-  int EN_PIN;
+  uint8_t RS_PIN;
+  uint8_t EN_PIN;
   // 4-bit data pins
-  int D4_PIN;
-  int D5_PIN;
-  int D6_PIN;
-  int D7_PIN;
+  uint8_t D4_PIN;
+  uint8_t D5_PIN;
+  uint8_t D6_PIN;
+  uint8_t D7_PIN;
 } LCD;
 
-const int BITMAP_HEIGHT = 8;
-const int BITMAP_WIDTH = 5;
+const uint8_t BITMAP_HEIGHT = 8;
+const uint8_t BITMAP_WIDTH = 5;
 // 8 rows of 5 bits
 typedef uint8_t Bitmap[BITMAP_HEIGHT];
 
@@ -39,11 +39,11 @@ void LCD_clear(LCD *lcd);
 
 // custom character creation
 // up to 16 custom chars (zero indexed)
-void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm);
+void LCD_create_char(LCD *lcd, uint8_t char_idx, const Bitmap bm);
 
 // controls
-void LCD_set_cursor(LCD *lcd, int row, int col);
+void LCD_set_cursor(LCD *lcd, uint8_t row, uint8_t col);
 void LCD_print(LCD *lcd, const char *c);
-void LCD_print(LCD *lcd, int n);
+void LCD_print(LCD *lcd, uint8_t n);
 
 #endif

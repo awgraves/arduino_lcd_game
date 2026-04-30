@@ -8,17 +8,17 @@ enum REG { IR = 0, DR = 1 }; // instruction vs data register
 // part of the initialization process
 // 8bit mode command is just a nibble (4 bits)
 // since only 4 wires are physically connected
-const int CMD_NIBBLE_8BIT_MODE = 0x3;
-const int CMD_NIBBLE_4BIT_MODE = 0x2;
+const uint8_t CMD_NIBBLE_8BIT_MODE = 0x3;
+const uint8_t CMD_NIBBLE_4BIT_MODE = 0x2;
 
 // full byte commands, sent in 2 nibbles
-const int CMD_4BIT_MODE = 0x28;
-const int CMD_CLEAR = 0x01;
-const int CMD_ENTRY_MODE = 0x06;
-const int CMD_DISPLAY_ON = 0x0C;
-const int CMD_DISPLAY_OFF = 0x08;
-const int CMD_SET_CGRAM_ADDR = 1 << 6;
-const int CMD_SET_DDRAM_ADDR = 1 << 7;
+const uint8_t CMD_4BIT_MODE = 0x28;
+const uint8_t CMD_CLEAR = 0x01;
+const uint8_t CMD_ENTRY_MODE = 0x06;
+const uint8_t CMD_DISPLAY_ON = 0x0C;
+const uint8_t CMD_DISPLAY_OFF = 0x08;
+const uint8_t CMD_SET_CGRAM_ADDR = 1 << 6;
+const uint8_t CMD_SET_DDRAM_ADDR = 1 << 7;
 
 static void write_nibble(LCD *lcd, uint8_t n, REG reg);
 static void write_command(LCD *lcd, uint8_t n);
@@ -66,7 +66,7 @@ void LCD_clear(LCD *lcd) {
   delay(2); // extra slow instruction, needs more time
 }
 
-void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm) {
+void LCD_create_char(LCD *lcd, uint8_t char_idx, const Bitmap bm) {
   char_idx =
       char_idx <= 7 ? char_idx : 7; // safety check, only 8 custom char slots
   int addr = char_idx * 8;          // offset for each row in CGRAM
@@ -76,7 +76,7 @@ void LCD_create_char(LCD *lcd, int char_idx, const Bitmap bm) {
     write_data(lcd, bm[i]);
 }
 
-void LCD_set_cursor(LCD *lcd, int row, int col) {
+void LCD_set_cursor(LCD *lcd, uint8_t row, uint8_t col) {
   // see pg. 11 of datasheet
   row = row == 0 ? 0x00 : 0x40;
   col = col < 15 ? col : 15;
@@ -90,7 +90,7 @@ void LCD_print(LCD *lcd, const char *c) {
   }
 }
 
-void LCD_print(LCD *lcd, int n) { write_data(lcd, n); }
+void LCD_print(LCD *lcd, uint8_t n) { write_data(lcd, n); }
 
 /* mid level helpers */
 static void write_byte(LCD *lcd, uint8_t n, REG reg);
