@@ -1,4 +1,6 @@
 #include "game.h"
+#include "input.h"
+#include "input_types.h"
 #include "joystick.h"
 #include "lcd.h"
 #include "render.h"
@@ -14,39 +16,24 @@ LCD lcd = {
     .D7_PIN = 13,
 };
 
-Joystick joy = {.X_PIN = 1, .Y_PIN = 0, .SW_PIN = 3};
+Joystick joystick = {.X_PIN = 1, .Y_PIN = 0, .SW_PIN = 3};
 
-Inputs inputs;
+GameInputs inputs;
 GameState s;
+
+void reset_game() {
+  GameState_init(&s);
+  load_world(&s);
+  render_init(&lcd);
+}
 
 void setup() {
   LCD_init(&lcd);
-  render_init(&lcd);
-
-  GameState_init(&s);
-  load_world(&s);
-}
-
-ButtonState sw_to_btn_state(SwitchState sw) {
-  switch (sw) {
-  case SW_OPEN:
-    return BTN_OPEN;
-  case SW_JUST_PRESSED:
-    return BTN_JUST_PRESSED;
-  case SW_HOLD:
-    return BTN_HOLD;
-  case SW_JUST_RELEASED:
-    return BTN_JUST_RELEASED;
-  }
-}
-
-inline void poll_inputs(Inputs *in) {
-  in->x_move = Joystick_X_poll(&joy);
-  in->btn_state = sw_to_btn_state(Joystick_SW_poll(&joy));
+  reset_game();
 }
 
 void loop() {
-  poll_inputs(&inputs);
+  GameInputs_poll(&inputs, &joystick);
   GameState_update(&s, &inputs);
   render(&s);
 

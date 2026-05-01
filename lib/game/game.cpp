@@ -1,29 +1,35 @@
 #include "game.h"
 #include <Arduino.h>
 
-/* Public API */
 void GameState_init(GameState *s) {
   memset(s, 0, sizeof(GameState));
   s->player.facing = CENTER;
 };
 
-static void update_player_pos(GameState *s, Inputs *in);
+static void run_game_tick(GameState *s, GameInputs *in);
+
+void GameState_update(GameState *s, GameInputs *in) { run_game_tick(s, in); }
+
+static void update_player_facing(GameState *s, GameInputs *in);
+static void update_player_pos(GameState *s, GameInputs *in);
 static void update_camera_pos(GameState *s);
 
-void GameState_update(GameState *s, Inputs *in) {
+static void run_game_tick(GameState *s, GameInputs *in) {
+  update_player_facing(s, in);
+  update_player_pos(s, in);
+  update_camera_pos(s);
+}
+
+static void update_player_facing(GameState *s, GameInputs *in) {
   if (in->x_move != 0) {
     s->player.facing = (in->x_move == 1) ? RIGHT : LEFT;
   } else if (s->player.on_ground) {
     // only allow face center when standing
     s->player.facing = CENTER;
   }
-
-  update_player_pos(s, in);
-  update_camera_pos(s);
 }
 
-/* helpers */
-static int8_t jump_vel[] = {
+static const int8_t jump_vel[] = {
     [JUMP_NONE] = 0,     //
     [JUMP_START] = 1,    //
     [JUMP_RISING] = 1,   //
@@ -34,11 +40,10 @@ static int8_t jump_vel[] = {
 static inline JumpPhase next_phase(JumpPhase p) {
   return p < JUMP_FALLING ? (JumpPhase)(p + 1) : JUMP_FALLING;
 }
-
 static bool is_blocked(GameState *s, int16_t x, int16_t y);
 
-static void update_player_pos(GameState *s, Inputs *in) {
-  // jump
+static void update_player_pos(GameState *s, GameInputs *in) {
+  // check for jump
   if (in->btn_state == BTN_JUST_PRESSED && s->player.on_ground) {
     s->player.jump_phase = JUMP_START;
   } else if (in->btn_state == BTN_JUST_RELEASED && !s->player.on_ground) {
@@ -51,7 +56,6 @@ static void update_player_pos(GameState *s, Inputs *in) {
     s->player.jump_phase = JUMP_FALLING;
   }
 
-  // calc next potential axis destinations
   int16_t pot_y = s->player.y + jump_vel[s->player.jump_phase];
   int16_t pot_x = s->player.x + in->x_move;
 

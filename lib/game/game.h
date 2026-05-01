@@ -1,5 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
+#include "input_types.h"
 #include <stdint.h>
 
 const int MAX_OBJECTS = 100;
@@ -37,19 +38,7 @@ typedef struct {
   int16_t camera_y;
 } GameState;
 
-typedef enum {
-  BTN_OPEN,
-  BTN_JUST_PRESSED,
-  BTN_HOLD,
-  BTN_JUST_RELEASED
-} ButtonState;
-
-typedef struct {
-  int8_t x_move;
-  ButtonState btn_state;
-} Inputs;
-
 void GameState_init(GameState *s);
-void GameState_update(GameState *s, Inputs *inputs);
+void GameState_update(GameState *s, GameInputs *inputs);
 
 #endif
