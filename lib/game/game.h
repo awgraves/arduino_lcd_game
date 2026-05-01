@@ -3,7 +3,12 @@
 #include "input_types.h"
 #include <stdint.h>
 
-const int MAX_OBJECTS = 100;
+typedef enum {
+  GAME_STATUS_PLAYING,
+  GAME_STATUS_LOST,
+  GAME_STATUS_WON,
+  GAME_STATUS_RESET
+} GameStatus;
 
 typedef enum { TILE_EMPTY, TILE_BLOCK, TILE_SPIKE, TILE_FLAG } Tile;
 
@@ -24,6 +29,7 @@ typedef enum {
 } JumpPhase;
 
 typedef struct {
+  GameStatus game_status;
   TileMap map;
 
   struct {

@@ -109,6 +109,7 @@ Sprite player_right = {.frames = {PLAYER_BM_RIGHT_0, PLAYER_BM_RIGHT_1},
 typedef struct {
   LCD *lcd;
   Grid buf;
+  bool freeze;
 } Renderer;
 
 static Renderer r;
@@ -116,6 +117,8 @@ static Renderer r;
 /* public API */
 void render_init(LCD *lcd) {
   r.lcd = lcd;
+  r.freeze = false;
+
   for (int i = 0; i < GRID_HEIGHT; i++) {
     for (int j = 0; j < GRID_WIDTH; j++) {
       r.buf[i][j] = ' '; // begin with empty spaces in each position
@@ -128,13 +131,37 @@ void render_init(LCD *lcd) {
   LCD_create_char(lcd, PLAYER_BM_RIGHT_1, player_right_1);
   LCD_create_char(lcd, BLOCK_BM, block);
   LCD_create_char(lcd, FLAG_BM, flag);
+
+  LCD_clear(lcd);
 }
 
 static char get_tile_bitmap_code(Tile t);
 static char get_player_bitmap_code(const GameState *s);
 static void render_grid(Grid g);
+static void render_new_at(uint8_t row, uint8_t col, char c);
+
+static void render_game_tick(const GameState *s);
+static void render_text(const char *text, const GameState *s);
 
 void render(const GameState *s) {
+  if (r.freeze)
+    return;
+  switch (s->game_status) {
+  case GAME_STATUS_PLAYING:
+    render_game_tick(s);
+    break;
+  case GAME_STATUS_LOST:
+    render_text("You died.", s);
+    break;
+  case GAME_STATUS_WON:
+    render_text("You win!", s);
+    break;
+  default:
+    return;
+  }
+}
+
+static void render_game_tick(const GameState *s) {
   Grid grid;
 
   // map offsets
@@ -157,6 +184,22 @@ void render(const GameState *s) {
       get_player_bitmap_code(s);
 
   render_grid(grid);
+}
+
+static void render_text(const char *text, const GameState *s) {
+  // render 1 final game_tick to capture the player having moved into a new tile
+  render_game_tick(s);
+
+  // then allow text to overwrite some of the tiles
+  uint8_t i = 0;
+  uint8_t row = s->player.y - s->camera_y; // avoid overwriting the player
+  while (*text) {
+    render_new_at(row, i, *text++);
+    i++;
+    delay(50); // typewriter effect
+  }
+
+  r.freeze = true;
 }
 
 /* helpers */
@@ -193,8 +236,6 @@ static char get_tile_bitmap_code(Tile t) {
   }
 }
 
-static void render_new_at(int row, int col, char c);
-
 static void render_grid(Grid g) {
   for (int i = 0; i < GRID_HEIGHT; i++) {
     for (int j = 0; j < GRID_WIDTH; j++) {
@@ -206,7 +247,7 @@ static void render_grid(Grid g) {
   }
 };
 
-static void render_new_at(int row, int col, char c) {
+static void render_new_at(uint8_t row, uint8_t col, char c) {
   LCD_set_cursor(r.lcd, row, col);
   LCD_print(r.lcd, c);
 }

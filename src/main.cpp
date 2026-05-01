@@ -37,5 +37,8 @@ void loop() {
   GameState_update(&s, &inputs);
   render(&s);
 
+  if (s.game_status == GAME_STATUS_RESET)
+    reset_game();
+
   delay(125);
 }
