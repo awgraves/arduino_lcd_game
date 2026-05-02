@@ -12,8 +12,11 @@ typedef enum {
 
 typedef enum { TILE_EMPTY, TILE_BLOCK, TILE_SPIKE, TILE_FLAG } Tile;
 
-const int MAX_MAP_WIDTH = 64;
-const int MAX_MAP_HEIGHT = 10;
+const int MAX_MAP_WIDTH = 32;
+const int MAX_MAP_HEIGHT = 8;
+
+const int MAX_CAM_X = MAX_MAP_WIDTH - 17;
+const int MAX_CAM_Y = MAX_MAP_HEIGHT - 2;
 
 // note the width comes before the height to match x, y coord convention
 typedef Tile TileMap[MAX_MAP_WIDTH][MAX_MAP_HEIGHT];

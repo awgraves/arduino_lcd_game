@@ -99,7 +99,12 @@ static void update_player_pos(GameState *s, GameInputs *in) {
 
 static void update_camera_pos(GameState *s) {
   s->camera_x = s->player.x - 8 >= 0 ? s->player.x - 8 : 0;
+  if (s->camera_x >= MAX_CAM_X)
+    s->camera_x = MAX_CAM_X;
+
   s->camera_y = s->player.y > 0 ? s->player.y - 1 : s->player.y;
+  if (s->camera_y >= MAX_CAM_Y)
+    s->camera_y = MAX_CAM_Y;
 }
 
 static bool is_blocked(GameState *s, int16_t x, int16_t y) {
