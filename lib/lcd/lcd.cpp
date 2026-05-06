@@ -7,7 +7,7 @@ enum REG { IR = 0, DR = 1 }; // instruction vs data register
 
 // part of the initialization process
 // 8bit mode command is just a nibble (4 bits)
-// since only 4 wires are physically connected
+// since only 4 data wires are physically connected
 const uint8_t CMD_NIBBLE_8BIT_MODE = 0x3;
 const uint8_t CMD_NIBBLE_4BIT_MODE = 0x2;
 

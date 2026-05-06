@@ -1,7 +1,5 @@
 # Arduino LCD Game
-A basic platformer style game on a 16x2 character LCD screen powered by an Arduino Uno.
-
-Hardware drivers for the joystick and LCD display were written from scratch for this project - no 3rd party libraries used!
+A basic platformer with a custom-written HD44780 16x2 LCD driver and joystick input abstraction layer.
 
 ## Hardware list
 1. [Arduino Uno R3](https://docs.arduino.cc/hardware/uno-rev3/)
