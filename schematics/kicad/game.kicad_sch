@@ -2258,6 +2258,16 @@
 	)
 	(wire
 		(pts
+			(xy 147.32 82.55) (xy 147.32 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "904b4e32-836e-4fce-bd83-1c364ef33ff3")
+	)
+	(wire
+		(pts
 			(xy 157.48 91.44) (xy 157.48 82.55)
 		)
 		(stroke
@@ -2305,6 +2315,16 @@
 			(type default)
 		)
 		(uuid "a9640b57-f503-43ec-8a87-ac71a119330d")
+	)
+	(wire
+		(pts
+			(xy 149.86 91.44) (xy 149.86 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b032dcfc-e06f-435d-8280-2496b09edf37")
 	)
 	(wire
 		(pts
@@ -2545,6 +2565,26 @@
 			(justify left bottom)
 		)
 		(uuid "b7bb1640-50ba-4c26-8ccb-44e9237ff9bd")
+	)
+	(label "LCD_RS"
+		(at 147.32 91.44 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cf06df37-2767-4b5a-b19d-13d64abf3110")
+	)
+	(label "LCD_EN"
+		(at 149.86 91.44 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d22f12a0-3d41-4cbe-b3cb-ea5a7d3bef0e")
 	)
 	(label "JOY_SW"
 		(at 139.7 91.44 90)
