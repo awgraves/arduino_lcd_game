@@ -1,7 +1,9 @@
 # Arduino LCD Game
 A basic platformer with a custom-written HD44780 16x2 LCD driver and joystick input abstraction layer.
 
-[Watch a walkthrough of it here](https://www.youtube.com/watch?v=DOQBl4cp8v0)
+![Game demo gif](/demo/lcd_game_demo.gif)
+
+See youtube video 👉 [here](https://www.youtube.com/watch?v=DOQBl4cp8v0)
 
 ## Hardware list
 1. [Arduino Uno R3](https://docs.arduino.cc/hardware/uno-rev3/)
