@@ -38,7 +38,7 @@ void LCD_init(LCD *lcd);
 void LCD_clear(LCD *lcd);
 
 // custom character creation
-// up to 16 custom chars (zero indexed)
+// up to 8 custom chars (zero indexed)
 void LCD_create_char(LCD *lcd, uint8_t char_idx, const Bitmap bm);
 
 // controls
