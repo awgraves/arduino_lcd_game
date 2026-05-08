@@ -26,6 +26,6 @@ See the `/schematics/kicad` dir in this project.
 ### Usage
 | Command | Description |
 |---------|---------------|
-|`make setup`| generates the `compile_commands.json` for clangd so IDE know proj dependency paths. |
-|`make upload`| compiles and uploads code to the arduino uno over USB connection. |
-|`make monitor`| opens a serial monitor connection to the arduino. Useful for debugging during development.|
+|`make setup`| Generates the `compile_commands.json` for clangd so the IDE knows proj dependency paths. |
+|`make upload`| Compiles and uploads code to the arduino uno over USB connection. |
+|`make monitor`| Opens a serial monitor connection to the arduino. Useful for debugging during development.|
